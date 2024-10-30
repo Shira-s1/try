@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <title> API Requests</title>
+</head>
+
+<body>
+    <h1> API Requests</h1>
+   <input id="calenderAdd" type="date"/>  <input id="addEventText" type="text" />
+    <button onclick="addEvent()">Add Event +</button>
+    <button onclick="updateEvent()">update Event :</button>
+    <button onclick="deleteEvent()">delete Event x</button>
+    <br />
+    <p>תוצאה</p>
+    <div id='calendar'></div>
+
+    <script>
+var calendarEl = document.getElementById('calendar');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            getEvent()
+        });
+
+
+        function getEvent() {
+            axios.get("https://localhost:7055/api/Event")
+                .then((res) => {
+                  
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        events:res.data
+                    });
+                    calendar.render();
+                });
+        }
+
+
+        function addEvent() {
+            axios.post("https://localhost:7055/api/Event", {
+                title: document.getElementById("addEventText").value ,
+                start: document.getElementById("calenderAdd").value,
+            })
+                .then((res) => {
+                    getEvent();
+                });
+        }
+
+        function updateEvent() {
+            let id = 1;
+            axios.put(`https://localhost:7055/api/Event/1${id}`, {
+                title: "updated event",
+                start: "2023-08-10",
+            })
+                .then((res) => {
+                    document.getElementById("request-result").innerHTML =
+                        "האירוע התעדכן בהצלחה";
+                });
+        }
+
+        function deleteEvent() {
+            let id = 1;
+            axios.delete(`https://localhost:7055/api/Event/1${id}`).then(res => {
+                document.getElementById("request-result").innerHTML =
+                    "האירוע נמחק בהצלחה";
+            })
+        }
+        </script>
+</body>
+
+</html>
